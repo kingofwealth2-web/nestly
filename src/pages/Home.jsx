@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
@@ -7,6 +7,16 @@ export default function Home() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const [categories, setCategories] = useState([])
+  const [revealed, setRevealed] = useState(false)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible') }),
+      { threshold: 0.12 }
+    )
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el))
+    return () => observer.disconnect()
+  }, [categories, featuredListings])
   const [featuredListings, setFeaturedListings] = useState([])
   const [siteStats, setSiteStats] = useState({ listings: '...', categories: '...', reviews: '...' })
   const [bookmarks, setBookmarks] = useState(new Set())
@@ -81,8 +91,7 @@ export default function Home() {
   return (
     <div style={{ background: 'var(--cream)' }}>
       {/* ── HERO ── */}
-      <section style={{
-        background: 'var(--navy)',
+      <section className="hero-gradient" style={{
         padding: '5rem 2rem 4rem',
         textAlign: 'center',
         position: 'relative',
@@ -94,27 +103,27 @@ export default function Home() {
           pointerEvents: 'none',
         }} />
 
-        <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '.1em', textTransform: 'uppercase', color: '#5DD6C8', marginBottom: '1rem', position: 'relative' }}>
+        <p className="anim-fade-up" style={{ fontSize: 12, fontWeight: 600, letterSpacing: '.1em', textTransform: 'uppercase', color: '#5DD6C8', marginBottom: '1rem', position: 'relative', animationDelay: '.1s' }}>
           The local discovery platform
         </p>
 
-        <h1 style={{
+        <h1 className="anim-fade-up" style={{
           fontFamily: 'DM Serif Display, serif',
           fontSize: 'clamp(2.4rem, 5vw, 3.8rem)',
           color: '#fff', lineHeight: 1.1,
           marginBottom: '1rem',
           maxWidth: 640, marginLeft: 'auto', marginRight: 'auto',
-          position: 'relative',
+          position: 'relative', animationDelay: '.2s',
         }}>
           Find the <em style={{ color: '#5DD6C8', fontStyle: 'italic' }}>perfect place</em><br />near you
         </h1>
 
-        <p style={{ color: 'rgba(255,255,255,.55)', fontSize: 16, maxWidth: 440, margin: '0 auto 2.5rem', lineHeight: 1.6, position: 'relative' }}>
+        <p className="anim-fade-up" style={{ color: 'rgba(255,255,255,.55)', fontSize: 16, maxWidth: 440, margin: '0 auto 2.5rem', lineHeight: 1.6, position: 'relative', animationDelay: '.3s' }}>
           Search restaurants, apartments, events and services in your neighbourhood.
         </p>
 
         {/* Search box */}
-        <form onSubmit={handleSearch} style={{
+        <form onSubmit={handleSearch} className="anim-fade-up" style={{ animationDelay: '.4s',
           display: 'flex', alignItems: 'center',
           background: '#fff', borderRadius: 12,
           maxWidth: 700, margin: '0 auto',
@@ -172,7 +181,7 @@ export default function Home() {
         </form>
 
         {/* Stats */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2rem', marginTop: '2rem', position: 'relative' }}>
+        <div className="anim-fade-up" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2rem', marginTop: '2rem', position: 'relative', animationDelay: '.5s' }}>
           <Stat num={siteStats.listings === '...' ? '...' : `${siteStats.listings}+`} label="Listings" />
           <div style={{ width: 1, height: 32, background: 'rgba(255,255,255,.12)' }} />
           <Stat num={siteStats.categories} label="Categories" />
@@ -183,8 +192,8 @@ export default function Home() {
 
       {/* ── CATEGORIES ── */}
       <div style={{ padding: '3.5rem 2rem', maxWidth: 1140, margin: '0 auto' }}>
-        <SectionHeader title="Browse by category" sub="Find exactly what you need" link="/listings" />
-        <div style={{
+        <div className="reveal"><SectionHeader title="Browse by category" sub="Find exactly what you need" link="/listings" /></div>
+        <div className="stagger reveal" style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))',
           gap: '.75rem',
@@ -193,22 +202,13 @@ export default function Home() {
             <Link
               key={cat.id || cat.slug}
               to={`/listings?category=${cat.slug}`}
+              className="anim-fade-up card-hover btn-press"
               style={{
                 background: '#fff', border: '1.5px solid var(--border)',
                 borderRadius: 14, padding: '1.25rem 1rem',
                 textAlign: 'center', cursor: 'pointer',
                 textDecoration: 'none', color: 'inherit',
-                display: 'block', transition: 'all .2s',
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.borderColor = 'var(--teal)'
-                e.currentTarget.style.transform = 'translateY(-2px)'
-                e.currentTarget.style.boxShadow = '0 8px 24px rgba(11,97,87,.12)'
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.borderColor = 'var(--border)'
-                e.currentTarget.style.transform = 'translateY(0)'
-                e.currentTarget.style.boxShadow = 'none'
+                display: 'block',
               }}
             >
               <div style={{
@@ -227,8 +227,8 @@ export default function Home() {
 
       {/* ── TRENDING LISTINGS ── */}
       <div style={{ padding: '0 2rem 3.5rem', maxWidth: 1140, margin: '0 auto' }}>
-        <SectionHeader title="Trending listings" sub="Verified for quality" link="/listings" />
-        <div style={{
+        <div className="reveal"><SectionHeader title="Trending listings" sub="Verified for quality" link="/listings" /></div>
+        <div className="stagger reveal" style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
           gap: '1.25rem',
@@ -294,9 +294,9 @@ export default function Home() {
       <section style={{ background: 'var(--teal-pale)', padding: '4rem 2rem' }}>
         <div style={{ maxWidth: 1140, margin: '0 auto' }}>
           <SectionHeader title="How Nestly works" sub="Three simple steps to find your place" />
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '1.25rem', marginTop: '2rem' }}>
+          <div className="stagger reveal" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '1.25rem', marginTop: '2rem' }}>
             {howSteps.map((step, i) => (
-              <div key={i} style={{ background: '#fff', borderRadius: 14, padding: '1.75rem 1.5rem', border: '1.5px solid var(--teal-mid)' }}>
+              <div key={i} className="anim-fade-up card-hover" style={{ background: '#fff', borderRadius: 14, padding: '1.75rem 1.5rem', border: '1.5px solid var(--teal-mid)' }}>
                 <div style={{ fontFamily: 'DM Serif Display, serif', fontSize: '2.5rem', lineHeight: 1, color: 'var(--teal-pale)', marginBottom: '.75rem', WebkitTextStroke: '1.5px var(--teal-mid)' }}>0{i + 1}</div>
                 <h4 style={{ fontSize: 15, fontWeight: 600, marginBottom: '.5rem' }}>{step.title}</h4>
                 <p style={{ fontSize: 13, color: 'var(--text-mid)', lineHeight: 1.6 }}>{step.desc}</p>
@@ -313,12 +313,8 @@ export default function Home() {
 
 function ListingCard({ listing, bookmarked, onBookmark }) {
   return (
-    <Link to={`/listings/${listing.id}`} style={{ textDecoration: 'none' }}>
-      <div
-        style={{ background: '#fff', borderRadius: 14, border: '1.5px solid var(--border)', overflow: 'hidden', transition: 'all .2s', cursor: 'pointer' }}
-        onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 12px 32px rgba(0,0,0,.1)' }}
-        onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none' }}
-      >
+    <Link to={`/listings/${listing.id}`} className="anim-fade-up" style={{ textDecoration: 'none', display: 'block' }}>
+      <div className="card-hover" style={{ background: '#fff', borderRadius: 14, border: '1.5px solid var(--border)', overflow: 'hidden', cursor: 'pointer' }}>
         <div style={{ height: 190, position: 'relative', overflow: 'hidden', background: listing.gradient || 'linear-gradient(135deg,#0B6157,#1a9e8f)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '3.5rem' }}>
           {listing.cover_image ? <img src={listing.cover_image} alt={listing.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : (listing.emoji || '🏠')}
           {listing.is_featured && <span style={{ position: 'absolute', top: '.75rem', left: '.75rem', fontSize: 11, fontWeight: 600, padding: '3px 8px', borderRadius: 6, background: 'rgba(11,97,87,.9)', color: '#fff' }}>⭐ Featured</span>}
@@ -393,7 +389,7 @@ function ChatWidget() {
   return (
     <div style={{ position: 'fixed', bottom: '1.5rem', right: '1.5rem', zIndex: 50 }}>
       {open && (
-        <div style={{ position: 'absolute', bottom: 64, right: 0, width: 320, background: '#fff', borderRadius: 14, overflow: 'hidden', border: '1.5px solid var(--border)', boxShadow: '0 20px 60px rgba(0,0,0,.18)', display: 'flex', flexDirection: 'column' }}>
+        <div className="anim-pop-in" style={{ position: 'absolute', bottom: 64, right: 0, width: 320, background: '#fff', borderRadius: 14, overflow: 'hidden', border: '1.5px solid var(--border)', boxShadow: '0 20px 60px rgba(0,0,0,.18)', display: 'flex', flexDirection: 'column' }}>
           <div style={{ background: 'var(--teal)', padding: '1rem 1.25rem', display: 'flex', alignItems: 'center', gap: '.75rem' }}>
             <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(255,255,255,.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
@@ -420,7 +416,7 @@ function ChatWidget() {
           </div>
         </div>
       )}
-      <button onClick={() => setOpen(o => !o)} style={{ width: 52, height: 52, background: 'var(--teal)', borderRadius: '50%', border: 'none', cursor: 'pointer', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 6px 24px rgba(11,97,87,.45)' }}>
+      <button onClick={() => setOpen(o => !o)} className="chat-fab btn-press" style={{ width: 52, height: 52, background: 'var(--teal)', borderRadius: '50%', border: 'none', cursor: 'pointer', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 6px 24px rgba(11,97,87,.45)' }}>
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
       </button>
     </div>

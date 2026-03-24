@@ -282,7 +282,7 @@ export default function ListingDetail() {
             {reviews.length === 0 ? (
               <p style={{ fontSize: 14, color: 'var(--text-light)' }}>No reviews yet. Be the first!</p>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              <div className="anim-slide-right" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                 {reviews.map(r => (
                   <div key={r.id} style={{ paddingBottom: '1.25rem', borderBottom: '1.5px solid var(--border)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '.5rem' }}>
@@ -406,8 +406,8 @@ export default function ListingDetail() {
 
       {/* Auth popup */}
       {showAuthPopup && (
-        <div onClick={() => setShowAuthPopup(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.45)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
-          <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: 18, padding: '2rem', maxWidth: 380, width: '100%', textAlign: 'center', boxShadow: '0 24px 64px rgba(0,0,0,.18)' }}>
+        <div className="modal-backdrop" onClick={() => setShowAuthPopup(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.45)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+          <div className="modal-content" onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: 18, padding: '2rem', maxWidth: 380, width: '100%', textAlign: 'center', boxShadow: '0 24px 64px rgba(0,0,0,.18)' }}>
             <div style={{ width: 52, height: 52, background: 'var(--teal-pale)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}>
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" strokeWidth="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             </div>

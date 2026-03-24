@@ -87,7 +87,7 @@ export default function Dashboard() {
       )}
 
       {/* Main content */}
-      <main style={{ padding: isMobile ? '1.25rem 1rem 90px' : '2rem', minWidth: 0 }}>
+      <main className="page-enter" style={{ padding: isMobile ? '1.25rem 1rem 90px' : '2rem', minWidth: 0 }}>
         <Routes>
           <Route index element={<DashHome />} />
           <Route path="listings" element={<MyListings />} />

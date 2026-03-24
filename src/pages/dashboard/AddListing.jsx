@@ -23,6 +23,9 @@ export default function AddListing() {
     tags: '', open_hours: '',
     cover_image: '',
     status: 'active',
+    services: '',
+    prices: '',
+
   })
 
   useEffect(() => {
@@ -52,6 +55,9 @@ export default function AddListing() {
         open_hours: data.open_hours ? JSON.stringify(data.open_hours) : '',
         cover_image: data.cover_image || '',
         status: data.status || 'active',
+        services: data.services ? data.services.join(', ') : '',
+        prices: data.prices ? JSON.stringify(data.prices) : '',
+
       })
       if (data.cover_image) setImagePreview(data.cover_image)
     }
@@ -74,7 +80,7 @@ export default function AddListing() {
     const ext = imageFile.name.split('.').pop()
     const path = `listings/${user.id}/${Date.now()}.${ext}`
     const { error: uploadError } = await supabase.storage
-      .from('listing_images')
+      .from('listing-images')
       .upload(path, imageFile, { upsert: true })
     setImageUploading(false)
     if (uploadError) {
@@ -82,7 +88,7 @@ export default function AddListing() {
       return form.cover_image || ''
     }
     const { data: { publicUrl } } = supabase.storage
-      .from('listing_images')
+      .from('listing-images')
       .getPublicUrl(path)
     return publicUrl
   }
@@ -113,15 +119,27 @@ export default function AddListing() {
       tags: form.tags ? form.tags.split(',').map(t => t.trim()).filter(Boolean) : [],
       cover_image: coverImageUrl,
       status: form.status,
+      services: form.services ? form.services.split(',').map(s => s.trim()).filter(Boolean) : [],
+      prices: (() => {
+        if (!form.prices.trim()) return null
+        try {
+          // Try JSON first, else parse "Item: Price" lines
+          return JSON.parse(form.prices)
+        } catch {
+          return form.prices.split('\n').map(line => {
+            const [name, ...rest] = line.split(':')
+            return { name: name?.trim(), price: rest.join(':').trim() }
+          }).filter(p => p.name && p.price)
+        }
+      })(),
     }
 
-    let dbError
+    let error
     if (isEdit) {
-      ;({ error: dbError } = await supabase.from('listings').update(payload).eq('id', id))
+      ;({ error } = await supabase.from('listings').update(payload).eq('id', id))
     } else {
-      ;({ error: dbError } = await supabase.from('listings').insert(payload))
+      ;({ error } = await supabase.from('listings').insert(payload))
     }
-    if (dbError) { setError(dbError.message); return }
 
     setLoading(false)
     if (error) { setError(error.message); return }
@@ -160,7 +178,7 @@ export default function AddListing() {
                 <input type="file" accept="image/*" onChange={handleImageChange} style={{ display: 'none' }} />
               </label>
               <p style={{ fontSize: 11, color: 'var(--text-light)', marginTop: '.5rem' }}>
-                Images are stored in Supabase Storage. Make sure the <code>listing_images</code> bucket is public.
+                Images are stored in Supabase Storage. Make sure the <code>listing-images</code> bucket is public.
               </p>
             </div>
           </div>
@@ -210,6 +228,26 @@ export default function AddListing() {
               <input type="number" value={form.price_from} onChange={e => set('price_from', e.target.value)} placeholder="e.g. 80" style={inputStyle} />
             </Field>
           </div>
+        </Card>
+
+        <Card title="Extra services">
+          <Field label="Services offered (comma separated)">
+            <input value={form.services} onChange={e => set('services', e.target.value)} placeholder="e.g. Free WiFi, Parking, Delivery, Home visits, Air conditioning" style={inputStyle} />
+          </Field>
+          <p style={{ fontSize: 12, color: 'var(--text-light)', marginTop: '.25rem' }}>These appear as feature badges on your listing.</p>
+        </Card>
+
+        <Card title="Price list">
+          <Field label="Add items and prices — one per line, format: Item name: Price">
+            <textarea
+              value={form.prices}
+              onChange={e => set('prices', e.target.value)}
+              rows={5}
+              placeholder={"Lunch special: GH₵80\nDinner set: GH₵150\nCoffee: GH₵25\nRoom (standard): GH₵450/night"}
+              style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.6 }}
+            />
+          </Field>
+          <p style={{ fontSize: 12, color: 'var(--text-light)', marginTop: '.25rem' }}>Shown as a price table on your listing page.</p>
         </Card>
 
         <Card title="Status">

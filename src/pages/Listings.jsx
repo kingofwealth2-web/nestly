@@ -102,7 +102,7 @@ export default function Listings() {
   }
 
   return (
-    <div style={{ background: 'var(--cream)', minHeight: '100vh' }}>
+    <div className="page-enter" style={{ background: 'var(--cream)', minHeight: '100vh' }}>
       {/* ── SEARCH BAR ── */}
       <div style={{ background: 'var(--navy)', padding: '1.5rem 2rem' }}>
         <form onSubmit={applySearch} style={{ display: 'flex', gap: '.75rem', maxWidth: 900, margin: '0 auto', flexWrap: 'wrap' }}>

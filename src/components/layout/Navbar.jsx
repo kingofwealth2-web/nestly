@@ -41,7 +41,7 @@ export default function Navbar({ onMenuClick }) {
   }
 
   return (
-    <nav style={{
+    <nav className="anim-slide-down" style={{
       position: 'sticky', top: 0, zIndex: 100,
       background: 'var(--navy)',
       display: 'flex', alignItems: 'center',
