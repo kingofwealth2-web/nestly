@@ -3,6 +3,39 @@ import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
 
+// ── Static data — declared before components to avoid TDZ in production build ──
+
+const searchFieldStyle = { flex: 1, display: 'flex', alignItems: 'center', padding: '.9rem 1.2rem', gap: '.6rem', borderRight: '1.5px solid var(--border)' }
+const searchInputStyle = { border: 'none', outline: 'none', fontFamily: 'DM Sans, sans-serif', fontSize: 14, color: 'var(--text)', background: 'transparent', width: '100%' }
+
+const iconBg = { apartments: '#EAF1FD', 'eat-and-drink': '#FEF3E8', events: '#FDEAEA', services: '#EAF1FD', wellness: '#F0EEFF', fitness: '#EAFAF0', cafes: '#FEF3E8', arts: '#FDEAEA' }
+
+const defaultCategories = [
+  { id: 1, name: 'Apartments', slug: 'apartments', icon: '🏠', listing_count: 0 },
+  { id: 2, name: 'Eat & Drink', slug: 'eat-and-drink', icon: '🍽️', listing_count: 0 },
+  { id: 3, name: 'Events', slug: 'events', icon: '🎉', listing_count: 0 },
+  { id: 4, name: 'Services', slug: 'services', icon: '🛠️', listing_count: 0 },
+  { id: 5, name: 'Wellness', slug: 'wellness', icon: '💆', listing_count: 0 },
+  { id: 6, name: 'Fitness', slug: 'fitness', icon: '🏋️', listing_count: 0 },
+  { id: 7, name: 'Cafés', slug: 'cafes', icon: '☕', listing_count: 0 },
+  { id: 8, name: 'Arts', slug: 'arts', icon: '🎭', listing_count: 0 },
+]
+
+const demoListings = [
+  { id: 'demo-1', title: 'Bella Vista Restaurant', address: 'Oxford Street, Osu', category: 'Eat & Drink', avg_rating: 5, review_count: 48, is_featured: true, price_range: 'From GH₵80', tags: ['Fine Dining', 'Italian', 'Rooftop'], gradient: 'linear-gradient(135deg,#0B6157,#1a9e8f)', emoji: '🍽️' },
+  { id: 'demo-2', title: 'Sunny 2-Bed Apartment', address: 'Cantonments, Accra', category: 'Apartments', avg_rating: 4, review_count: 12, is_featured: true, price_range: 'GH₵950/mo', tags: ['2 Bed', 'A/C', 'Furnished'], gradient: 'linear-gradient(135deg,#1E3A5F,#2d5f9e)', emoji: '🏠' },
+  { id: 'demo-3', title: 'Sticky Band Live', address: 'Labadi Beach, Accra', category: 'Events', avg_rating: 5, review_count: 31, is_featured: true, price_range: 'GH₵40 entry', tags: ['Concert', 'Live Music', 'Bar'], gradient: 'linear-gradient(135deg,#5B2D8E,#8b4fd8)', emoji: '🎵' },
+]
+
+const mapDots = [{ x: '30%', y: '35%' }, { x: '55%', y: '55%' }, { x: '45%', y: '25%' }, { x: '70%', y: '42%' }, { x: '20%', y: '60%' }]
+
+const howSteps = [
+  { title: 'Find a place', desc: 'Search by area, category, or let our AI assistant help you find exactly what you\'re looking for.' },
+  { title: 'Check reviews', desc: 'Read honest reviews from verified visitors and see ratings before you make a decision.' },
+  { title: 'Make a booking', desc: 'Reserve a table, book an apartment, or register for an event directly through the platform.' },
+  { title: 'List your business', desc: 'Register as a vendor, add your listing, and start receiving bookings from local customers.' },
+]
+
 export default function Home() {
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -453,34 +486,3 @@ function MapDot({ dot }) {
     </div>
   )
 }
-
-const searchFieldStyle = { flex: 1, display: 'flex', alignItems: 'center', padding: '.9rem 1.2rem', gap: '.6rem', borderRight: '1.5px solid var(--border)' }
-const searchInputStyle = { border: 'none', outline: 'none', fontFamily: 'DM Sans, sans-serif', fontSize: 14, color: 'var(--text)', background: 'transparent', width: '100%' }
-
-const iconBg = { apartments: '#EAF1FD', 'eat-and-drink': '#FEF3E8', events: '#FDEAEA', services: '#EAF1FD', wellness: '#F0EEFF', fitness: '#EAFAF0', cafes: '#FEF3E8', arts: '#FDEAEA' }
-
-const defaultCategories = [
-  { id: 1, name: 'Apartments', slug: 'apartments', icon: '🏠', listing_count: 0 },
-  { id: 2, name: 'Eat & Drink', slug: 'eat-and-drink', icon: '🍽️', listing_count: 0 },
-  { id: 3, name: 'Events', slug: 'events', icon: '🎉', listing_count: 0 },
-  { id: 4, name: 'Services', slug: 'services', icon: '🛠️', listing_count: 0 },
-  { id: 5, name: 'Wellness', slug: 'wellness', icon: '💆', listing_count: 0 },
-  { id: 6, name: 'Fitness', slug: 'fitness', icon: '🏋️', listing_count: 0 },
-  { id: 7, name: 'Cafés', slug: 'cafes', icon: '☕', listing_count: 0 },
-  { id: 8, name: 'Arts', slug: 'arts', icon: '🎭', listing_count: 0 },
-]
-
-const demoListings = [
-  { id: 'demo-1', title: 'Bella Vista Restaurant', address: 'Oxford Street, Osu', category: 'Eat & Drink', avg_rating: 5, review_count: 48, is_featured: true, price_range: 'From GH₵80', tags: ['Fine Dining', 'Italian', 'Rooftop'], gradient: 'linear-gradient(135deg,#0B6157,#1a9e8f)', emoji: '🍽️' },
-  { id: 'demo-2', title: 'Sunny 2-Bed Apartment', address: 'Cantonments, Accra', category: 'Apartments', avg_rating: 4, review_count: 12, is_featured: true, price_range: 'GH₵950/mo', tags: ['2 Bed', 'A/C', 'Furnished'], gradient: 'linear-gradient(135deg,#1E3A5F,#2d5f9e)', emoji: '🏠' },
-  { id: 'demo-3', title: 'Sticky Band Live', address: 'Labadi Beach, Accra', category: 'Events', avg_rating: 5, review_count: 31, is_featured: true, price_range: 'GH₵40 entry', tags: ['Concert', 'Live Music', 'Bar'], gradient: 'linear-gradient(135deg,#5B2D8E,#8b4fd8)', emoji: '🎵' },
-]
-
-const mapDots = [{ x: '30%', y: '35%' }, { x: '55%', y: '55%' }, { x: '45%', y: '25%' }, { x: '70%', y: '42%' }, { x: '20%', y: '60%' }]
-
-const howSteps = [
-  { title: 'Find a place', desc: 'Search by area, category, or let our AI assistant help you find exactly what you\'re looking for.' },
-  { title: 'Check reviews', desc: 'Read honest reviews from verified visitors and see ratings before you make a decision.' },
-  { title: 'Make a booking', desc: 'Reserve a table, book an apartment, or register for an event directly through the platform.' },
-  { title: 'List your business', desc: 'Register as a vendor, add your listing, and start receiving bookings from local customers.' },
-]
