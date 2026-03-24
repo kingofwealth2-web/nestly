@@ -1,20 +1,24 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { useAuth } from '../context/AuthContext'
 
 export default function Home() {
+  const { user } = useAuth()
+  const navigate = useNavigate()
   const [categories, setCategories] = useState([])
   const [featuredListings, setFeaturedListings] = useState([])
   const [siteStats, setSiteStats] = useState({ listings: '...', categories: '...', reviews: '...' })
+  const [bookmarks, setBookmarks] = useState(new Set())
   const [searchQuery, setSearchQuery] = useState('')
   const [searchLocation, setSearchLocation] = useState('')
   const [searchCategory, setSearchCategory] = useState('')
-  const navigate = useNavigate()
 
   useEffect(() => {
     fetchCategories()
     fetchFeaturedListings()
     fetchSiteStats()
+    if (user) fetchBookmarks()
   }, [])
 
   async function fetchSiteStats() {
@@ -28,6 +32,23 @@ export default function Home() {
       categories: categoriesRes.count ?? '—',
       reviews: reviewsRes.count ?? '—',
     })
+  }
+
+  async function fetchBookmarks() {
+    const { data } = await supabase.from('bookmarks').select('listing_id').eq('user_id', user.id)
+    setBookmarks(new Set(data?.map(b => b.listing_id) || []))
+  }
+
+  async function toggleBookmark(e, listingId) {
+    e.preventDefault()
+    if (!user) { navigate('/login'); return }
+    if (bookmarks.has(listingId)) {
+      await supabase.from('bookmarks').delete().eq('listing_id', listingId).eq('user_id', user.id)
+      setBookmarks(prev => { const n = new Set(prev); n.delete(listingId); return n })
+    } else {
+      await supabase.from('bookmarks').insert({ listing_id: listingId, user_id: user.id })
+      setBookmarks(prev => new Set([...prev, listingId]))
+    }
   }
 
   async function fetchCategories() {
@@ -213,7 +234,7 @@ export default function Home() {
           gap: '1.25rem',
         }}>
           {(featuredListings.length > 0 ? featuredListings : demoListings).map(listing => (
-            <ListingCard key={listing.id} listing={listing} />
+            <ListingCard key={listing.id} listing={listing} bookmarked={bookmarks.has(listing.id)} onBookmark={toggleBookmark} />
           ))}
         </div>
       </div>
@@ -290,7 +311,7 @@ export default function Home() {
   )
 }
 
-function ListingCard({ listing }) {
+function ListingCard({ listing, bookmarked, onBookmark }) {
   return (
     <Link to={`/listings/${listing.id}`} style={{ textDecoration: 'none' }}>
       <div
@@ -302,8 +323,8 @@ function ListingCard({ listing }) {
           {listing.cover_image ? <img src={listing.cover_image} alt={listing.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : (listing.emoji || '🏠')}
           {listing.is_featured && <span style={{ position: 'absolute', top: '.75rem', left: '.75rem', fontSize: 11, fontWeight: 600, padding: '3px 8px', borderRadius: 6, background: 'rgba(11,97,87,.9)', color: '#fff' }}>⭐ Featured</span>}
           {listing.tags?.length > 0 && <span style={{ position: 'absolute', bottom: '.75rem', left: '.75rem', fontSize: 10, fontWeight: 500, padding: '3px 8px', background: 'rgba(10,15,25,.65)', color: 'rgba(255,255,255,.9)', borderRadius: 6, maxWidth: 200, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{listing.tags.join(' · ')}</span>}
-          <button onClick={e => e.preventDefault()} style={{ position: 'absolute', top: '.75rem', right: '.75rem', width: 32, height: 32, borderRadius: '50%', background: 'rgba(255,255,255,.9)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-mid)' }}>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+          <button onClick={e => onBookmark(e, listing.id)} style={{ position: 'absolute', top: '.75rem', right: '.75rem', width: 32, height: 32, borderRadius: '50%', background: 'rgba(255,255,255,.9)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: bookmarked ? '#DC2626' : 'var(--text-mid)' }}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill={bookmarked ? '#DC2626' : 'none'} stroke={bookmarked ? '#DC2626' : 'currentColor'} strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
           </button>
         </div>
         <div style={{ padding: '1rem 1.1rem' }}>
