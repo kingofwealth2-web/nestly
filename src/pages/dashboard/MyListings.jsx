@@ -8,8 +8,9 @@ export default function MyListings() {
   const [listings, setListings] = useState([])
   const [loading, setLoading] = useState(true)
   const [deleting, setDeleting] = useState(null)
+  const [bookmarks, setBookmarks] = useState(new Set())
 
-  useEffect(() => { fetchListings() }, [user])
+  useEffect(() => { fetchListings(); fetchBookmarks() }, [user])
 
   async function fetchListings() {
     const { data } = await supabase
@@ -19,6 +20,23 @@ export default function MyListings() {
       .order('created_at', { ascending: false })
     setListings(data || [])
     setLoading(false)
+  }
+
+  async function fetchBookmarks() {
+    if (!user) return
+    const { data } = await supabase.from('bookmarks').select('listing_id').eq('user_id', user.id)
+    setBookmarks(new Set(data?.map(b => b.listing_id) || []))
+  }
+
+  async function toggleBookmark(e, listingId) {
+    e.preventDefault()
+    if (bookmarks.has(listingId)) {
+      await supabase.from('bookmarks').delete().eq('listing_id', listingId).eq('user_id', user.id)
+      setBookmarks(prev => { const n = new Set(prev); n.delete(listingId); return n })
+    } else {
+      await supabase.from('bookmarks').insert({ listing_id: listingId, user_id: user.id })
+      setBookmarks(prev => new Set([...prev, listingId]))
+    }
   }
 
   async function deleteListing(id) {
@@ -83,6 +101,9 @@ export default function MyListings() {
                 <div style={{ display: 'flex', gap: '.5rem', flexShrink: 0 }}>
                   <button onClick={() => toggleStatus(l)} style={{ padding: '.5rem .9rem', border: '1.5px solid var(--border)', borderRadius: 7, background: '#fff', color: 'var(--text-mid)', fontSize: 12, cursor: 'pointer', fontFamily: 'DM Sans, sans-serif', fontWeight: 500 }}>
                     {l.status === 'active' ? 'Deactivate' : 'Activate'}
+                  </button>
+                  <button onClick={e => toggleBookmark(e, l.id)} style={{ padding: '.5rem .9rem', border: '1.5px solid var(--border)', borderRadius: 7, background: bookmarks.has(l.id) ? '#FEF2F2' : '#fff', color: bookmarks.has(l.id) ? '#DC2626' : 'var(--text-mid)', fontSize: 12, cursor: 'pointer', fontFamily: 'DM Sans, sans-serif', fontWeight: 500 }}>
+                    {bookmarks.has(l.id) ? '♥ Saved' : '♡ Save'}
                   </button>
                   <Link to={`/dashboard/listings/edit/${l.id}`} style={{ padding: '.5rem .9rem', border: '1.5px solid var(--teal)', borderRadius: 7, background: 'var(--teal-pale)', color: 'var(--teal)', fontSize: 12, fontWeight: 500, textDecoration: 'none' }}>
                     Edit

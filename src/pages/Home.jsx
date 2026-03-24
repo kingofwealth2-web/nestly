@@ -285,31 +285,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── REVIEWS ── */}
-      <section style={{ background: 'var(--navy)', padding: '4rem 2rem' }}>
-        <div style={{ maxWidth: 1140, margin: '0 auto' }}>
-          <h2 style={{ fontFamily: 'DM Serif Display, serif', color: '#fff', fontSize: '1.75rem', marginBottom: '.5rem' }}>What our users say</h2>
-          <p style={{ fontSize: 14, color: 'rgba(255,255,255,.45)', marginBottom: '2rem' }}>Honest opinions from real people on the platform</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.25rem' }}>
-            {reviews.map((r, i) => (
-              <div key={i} style={{ background: 'var(--navy-mid)', borderRadius: 14, padding: '1.5rem', border: '1px solid rgba(255,255,255,.08)' }}>
-                <div style={{ display: 'flex', gap: '.2rem', marginBottom: '1rem' }}>
-                  {[...Array(r.rating)].map((_, j) => <span key={j} style={{ color: '#F59E0B', fontSize: 14 }}>★</span>)}
-                </div>
-                <p style={{ fontSize: 14, color: 'rgba(255,255,255,.7)', lineHeight: 1.65, marginBottom: '1.25rem', fontStyle: 'italic' }}>"{r.text}"</p>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem' }}>
-                  <div style={{ width: 38, height: 38, borderRadius: '50%', background: 'var(--teal)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 600, color: '#fff', flexShrink: 0 }}>{r.initials}</div>
-                  <div>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>{r.name}</div>
-                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,.4)' }}>{r.role}</div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       <ChatWidget />
     </div>
   )
@@ -491,10 +466,4 @@ const howSteps = [
   { title: 'Check reviews', desc: 'Read honest reviews from verified visitors and see ratings before you make a decision.' },
   { title: 'Make a booking', desc: 'Reserve a table, book an apartment, or register for an event directly through the platform.' },
   { title: 'List your business', desc: 'Register as a vendor, add your listing, and start receiving bookings from local customers.' },
-]
-
-const reviews = [
-  { rating: 5, text: 'Found an amazing apartment in Cantonments within two days. The booking process was smooth and the owner was super responsive through the messages feature.', initials: 'AK', name: 'Ama Kusi', role: 'Tenant' },
-  { rating: 5, text: 'As a restaurant owner, Nestly has been a game changer. Table bookings are up significantly and I can manage everything from the vendor dashboard.', initials: 'JO', name: 'Jojo Ofori', role: 'Restaurant Owner' },
-  { rating: 4, text: 'The map view is really helpful for discovering places nearby. I use the AI assistant to find things to do on weekends — it actually gives good suggestions.', initials: 'KA', name: 'Kwame Asante', role: 'Regular user' },
 ]

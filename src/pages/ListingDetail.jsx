@@ -29,6 +29,7 @@ export default function ListingDetail() {
   const [reviewLoading, setReviewLoading] = useState(false)
   const [reviewError, setReviewError] = useState('')
   const [hoverRating, setHoverRating] = useState(0)
+  const [showAuthPopup, setShowAuthPopup] = useState(false)
   const mapRef = useRef(null)
   const mapInstanceRef = useRef(null)
 
@@ -89,7 +90,7 @@ export default function ListingDetail() {
   }
 
   async function toggleBookmark() {
-    if (!user) { navigate('/login'); return }
+    if (!user) { setShowAuthPopup(true); return }
     if (bookmarked) {
       await supabase.from('bookmarks').delete().eq('listing_id', id).eq('user_id', user.id)
       setBookmarked(false)
@@ -101,7 +102,7 @@ export default function ListingDetail() {
 
   async function submitBooking(e) {
     e.preventDefault()
-    if (!user) { navigate('/login'); return }
+    if (!user) { setShowAuthPopup(true); return }
     if (!bookDate) { setBookError('Please select a date.'); return }
     setBookLoading(true)
     setBookError('')
@@ -368,11 +369,18 @@ export default function ListingDetail() {
                   <div style={{ fontSize: 12, color: 'var(--text-light)' }}>Listing owner</div>
                 </div>
               </div>
-              {user && user.id !== listing.owner_id && (
-                <Link to={`/dashboard/messages?listing=${id}&owner=${listing.owner_id}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '.4rem', marginTop: '1rem', padding: '.6rem', border: '1.5px solid var(--border)', borderRadius: 9, fontSize: 13, fontWeight: 500, color: 'var(--text)', textDecoration: 'none' }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-                  Message owner
-                </Link>
+              {listing.owner_id !== user?.id && (
+                user ? (
+                  <Link to={`/dashboard/messages?listing=${id}&owner=${listing.owner_id}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '.4rem', marginTop: '1rem', padding: '.6rem', background: 'var(--teal)', borderRadius: 9, fontSize: 13, fontWeight: 600, color: '#fff', textDecoration: 'none' }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                    Ask a question
+                  </Link>
+                ) : (
+                  <button onClick={() => setShowAuthPopup(true)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '.4rem', marginTop: '1rem', padding: '.6rem', background: 'var(--teal)', border: 'none', borderRadius: 9, fontSize: 13, fontWeight: 600, color: '#fff', cursor: 'pointer', width: '100%' }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                    Ask a question
+                  </button>
+                )
               )}
             </div>
           )}
@@ -383,10 +391,42 @@ export default function ListingDetail() {
               <h3 style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-mid)', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: '1rem' }}>Location</h3>
               <div ref={mapRef} style={{ borderRadius: 10, overflow: 'hidden', height: 180 }} />
               <p style={{ fontSize: 13, color: 'var(--text-mid)', marginTop: '.75rem' }}>{listing.address}, {listing.city}</p>
+              <a
+                href={`https://www.google.com/maps/dir/?api=1&destination=${listing.lat},${listing.lng}`}
+                target="_blank" rel="noopener noreferrer"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '.4rem', marginTop: '.75rem', fontSize: 13, fontWeight: 500, color: 'var(--teal)', textDecoration: 'none' }}
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+                Get directions
+              </a>
             </div>
           )}
         </div>
       </div>
+
+      {/* Auth popup */}
+      {showAuthPopup && (
+        <div onClick={() => setShowAuthPopup(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.45)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+          <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: 18, padding: '2rem', maxWidth: 380, width: '100%', textAlign: 'center', boxShadow: '0 24px 64px rgba(0,0,0,.18)' }}>
+            <div style={{ width: 52, height: 52, background: 'var(--teal-pale)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" strokeWidth="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <h3 style={{ fontFamily: 'DM Serif Display, serif', fontSize: '1.3rem', color: 'var(--text)', marginBottom: '.5rem' }}>Sign in to continue</h3>
+            <p style={{ fontSize: 13, color: 'var(--text-light)', lineHeight: 1.6, marginBottom: '1.5rem' }}>
+              You need an account to bookmark listings, send messages, and make bookings.
+            </p>
+            <div style={{ display: 'flex', gap: '.75rem' }}>
+              <Link to="/register" style={{ flex: 1, padding: '.75rem', background: 'var(--teal)', color: '#fff', borderRadius: 9, textDecoration: 'none', fontSize: 14, fontWeight: 600, textAlign: 'center' }}>
+                Create account
+              </Link>
+              <Link to="/login" style={{ flex: 1, padding: '.75rem', border: '1.5px solid var(--border)', color: 'var(--text-mid)', borderRadius: 9, textDecoration: 'none', fontSize: 14, fontWeight: 500, textAlign: 'center' }}>
+                Sign in
+              </Link>
+            </div>
+            <button onClick={() => setShowAuthPopup(false)} style={{ marginTop: '1rem', background: 'none', border: 'none', fontSize: 12, color: 'var(--text-light)', cursor: 'pointer' }}>Maybe later</button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

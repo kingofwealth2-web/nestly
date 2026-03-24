@@ -52,7 +52,7 @@ export default function Footer() {
           fontSize: 12
         }}>
           <span>© {new Date().getFullYear()} Nestly. All rights reserved.</span>
-          <span>Built with React + Supabase</span>
+          <span>Built by <a href="https://github.com" target="_blank" rel="noopener noreferrer" style={{ color: "rgba(255,255,255,.45)", textDecoration: "none" }}>Prince Anquandah</a></span>
         </div>
       </div>
     </footer>
@@ -63,8 +63,8 @@ function FooterCol({ title, links }) {
   return (
     <div>
       <h4 style={{ fontSize: 13, fontWeight: 600, color: '#fff', marginBottom: '.75rem' }}>{title}</h4>
-      {links.map((l, i) => (
-        <Link key={`${l.to}-${i}`} to={l.to} style={{
+      {links.map(l => (
+        <Link key={l.to} to={l.to} style={{
           display: 'block', fontSize: 13,
           color: 'rgba(255,255,255,.45)', textDecoration: 'none',
           padding: '.25rem 0'
