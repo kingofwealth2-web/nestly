@@ -74,7 +74,7 @@ export default function AddListing() {
     const ext = imageFile.name.split('.').pop()
     const path = `listings/${user.id}/${Date.now()}.${ext}`
     const { error: uploadError } = await supabase.storage
-      .from('listing-images')
+      .from('listing_images')
       .upload(path, imageFile, { upsert: true })
     setImageUploading(false)
     if (uploadError) {
@@ -82,7 +82,7 @@ export default function AddListing() {
       return form.cover_image || ''
     }
     const { data: { publicUrl } } = supabase.storage
-      .from('listing-images')
+      .from('listing_images')
       .getPublicUrl(path)
     return publicUrl
   }
@@ -160,7 +160,7 @@ export default function AddListing() {
                 <input type="file" accept="image/*" onChange={handleImageChange} style={{ display: 'none' }} />
               </label>
               <p style={{ fontSize: 11, color: 'var(--text-light)', marginTop: '.5rem' }}>
-                Images are stored in Supabase Storage. Make sure the <code>listing-images</code> bucket is public.
+                Images are stored in Supabase Storage. Make sure the <code>listing_images</code> bucket is public.
               </p>
             </div>
           </div>
