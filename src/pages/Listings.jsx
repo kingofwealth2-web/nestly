@@ -3,6 +3,12 @@ import { Link, useSearchParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
 
+const filterInput = {
+  border: '1.5px solid var(--border)', borderRadius: 7,
+  padding: '.5rem .75rem', fontFamily: 'DM Sans, sans-serif',
+  fontSize: 13, color: 'var(--text)', background: 'var(--cream)', outline: 'none',
+}
+
 export default function Listings() {
   const [searchParams, setSearchParams] = useSearchParams()
   const [listings, setListings] = useState([])
@@ -213,10 +219,7 @@ export default function Listings() {
 function ListCard({ listing, bookmarked, onBookmark }) {
   return (
     <Link to={`/listings/${listing.id}`} style={{ textDecoration: 'none' }}>
-      <div style={{ background: '#fff', borderRadius: 14, border: '1.5px solid var(--border)', display: 'flex', overflow: 'hidden', transition: 'all .2s' }}
-        onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,.08)'; e.currentTarget.style.borderColor = '#d0cdc8' }}
-        onMouseLeave={e => { e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.borderColor = 'var(--border)' }}
-      >
+      <div className="card-hover" style={{ background: '#fff', borderRadius: 14, border: '1.5px solid var(--border)', display: 'flex', overflow: 'hidden' }}>
         <div style={{ width: 200, flexShrink: 0, background: 'linear-gradient(135deg,#0B6157,#1a9e8f)', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '3rem', overflow: 'hidden' }}>
           {listing.cover_image ? <img src={listing.cover_image} alt={listing.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '🏠'}
           {listing.is_featured && <span style={{ position: 'absolute', top: '.65rem', left: '.65rem', fontSize: 10, fontWeight: 600, padding: '2px 7px', borderRadius: 5, background: 'rgba(11,97,87,.9)', color: '#fff' }}>⭐ Featured</span>}
@@ -260,10 +263,7 @@ function ListCard({ listing, bookmarked, onBookmark }) {
 function GridCard({ listing, bookmarked, onBookmark }) {
   return (
     <Link to={`/listings/${listing.id}`} style={{ textDecoration: 'none' }}>
-      <div style={{ background: '#fff', borderRadius: 14, border: '1.5px solid var(--border)', overflow: 'hidden', transition: 'all .2s' }}
-        onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 12px 32px rgba(0,0,0,.1)' }}
-        onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none' }}
-      >
+      <div className="card-hover" style={{ background: '#fff', borderRadius: 14, border: '1.5px solid var(--border)', overflow: 'hidden' }}>
         <div style={{ height: 190, background: 'linear-gradient(135deg,#0B6157,#1a9e8f)', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '3.5rem', overflow: 'hidden' }}>
           {listing.cover_image ? <img src={listing.cover_image} alt={listing.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '🏠'}
           {listing.is_featured && <span style={{ position: 'absolute', top: '.75rem', left: '.75rem', fontSize: 11, fontWeight: 600, padding: '3px 8px', borderRadius: 6, background: 'rgba(11,97,87,.9)', color: '#fff' }}>⭐ Featured</span>}
@@ -398,10 +398,4 @@ function EmptyState() {
       <Link to="/listings" style={{ padding: '.65rem 1.5rem', background: 'var(--teal)', color: '#fff', borderRadius: 8, textDecoration: 'none', fontSize: 14, fontWeight: 500 }}>Clear search</Link>
     </div>
   )
-}
-
-const filterInput = {
-  border: '1.5px solid var(--border)', borderRadius: 7,
-  padding: '.5rem .75rem', fontFamily: 'DM Sans, sans-serif',
-  fontSize: 13, color: 'var(--text)', background: 'var(--cream)', outline: 'none',
 }

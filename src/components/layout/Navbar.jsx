@@ -3,6 +3,22 @@ import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../context/AuthContext'
 
+const navIconBtn = {
+  width: 38, height: 38, border: 'none', cursor: 'pointer',
+  background: 'rgba(255,255,255,.08)', borderRadius: 8,
+  display: 'flex', alignItems: 'center', justifyContent: 'center',
+  color: 'rgba(255,255,255,.8)', position: 'relative',
+}
+
+const navBtnStyle = {
+  height: 36, padding: '0 1rem', borderRadius: 8,
+  border: '1.5px solid rgba(255,255,255,.2)',
+  background: 'transparent', color: 'rgba(255,255,255,.85)',
+  fontFamily: 'DM Sans, sans-serif', fontSize: 13, fontWeight: 500,
+  cursor: 'pointer', textDecoration: 'none',
+  display: 'flex', alignItems: 'center', whiteSpace: 'nowrap',
+}
+
 export default function Navbar({ onMenuClick }) {
   const { user, signOut } = useAuth()
   const navigate = useNavigate()
@@ -108,20 +124,4 @@ export default function Navbar({ onMenuClick }) {
       </button>
     </nav>
   )
-}
-
-const navIconBtn = {
-  width: 38, height: 38, border: 'none', cursor: 'pointer',
-  background: 'rgba(255,255,255,.08)', borderRadius: 8,
-  display: 'flex', alignItems: 'center', justifyContent: 'center',
-  color: 'rgba(255,255,255,.8)', position: 'relative',
-}
-
-const navBtnStyle = {
-  height: 36, padding: '0 1rem', borderRadius: 8,
-  border: '1.5px solid rgba(255,255,255,.2)',
-  background: 'transparent', color: 'rgba(255,255,255,.85)',
-  fontFamily: 'DM Sans, sans-serif', fontSize: 13, fontWeight: 500,
-  cursor: 'pointer', textDecoration: 'none',
-  display: 'flex', alignItems: 'center', whiteSpace: 'nowrap',
 }

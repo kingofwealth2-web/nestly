@@ -1,6 +1,19 @@
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 
+const linkStyle = {
+  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+  padding: '.65rem 1.5rem',
+  color: 'rgba(255,255,255,.75)', fontSize: 14,
+  textDecoration: 'none',
+}
+
+const sectionLabel = {
+  fontSize: 10, fontWeight: 600, letterSpacing: '.08em',
+  textTransform: 'uppercase', color: 'rgba(255,255,255,.3)',
+  padding: '.5rem 1.5rem .25rem'
+}
+
 const navLinks = [
   { label: 'Home', to: '/' },
   { label: 'All listings', to: '/listings' },
@@ -138,17 +151,4 @@ function Chevron() {
       <polyline points="9 18 15 12 9 6"/>
     </svg>
   )
-}
-
-const sectionLabel = {
-  fontSize: 10, fontWeight: 600, letterSpacing: '.08em',
-  textTransform: 'uppercase', color: 'rgba(255,255,255,.3)',
-  padding: '.5rem 1.5rem .25rem'
-}
-
-const linkStyle = {
-  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-  padding: '.65rem 1.5rem',
-  color: 'rgba(255,255,255,.75)', fontSize: 14,
-  textDecoration: 'none',
 }

@@ -61,10 +61,7 @@ export default function DashHome() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
         {statCards.map(s => (
           <Link key={s.to} to={s.to} style={{ textDecoration: 'none' }}>
-            <div style={{ background: '#fff', borderRadius: 14, border: '1.5px solid var(--border)', padding: '1.25rem', transition: 'all .2s' }}
-              onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,.08)'; e.currentTarget.style.transform = 'translateY(-2px)' }}
-              onMouseLeave={e => { e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.transform = 'translateY(0)' }}
-            >
+            <div className="card-hover" style={{ background: '#fff', borderRadius: 14, border: '1.5px solid var(--border)', padding: '1.25rem' }}>
               <div style={{ width: 40, height: 40, borderRadius: 10, background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, marginBottom: '.85rem' }}>{s.icon}</div>
               <div style={{ fontFamily: 'DM Serif Display, serif', fontSize: '1.8rem', color: s.color, lineHeight: 1 }}>{loading ? '—' : s.value}</div>
               <div style={{ fontSize: 13, color: 'var(--text-light)', marginTop: '.25rem' }}>{s.label}</div>

@@ -2,6 +2,14 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 
+const inputStyle = {
+  width: '100%', padding: '.75rem 1rem',
+  border: '1.5px solid var(--border)', borderRadius: 9,
+  fontFamily: 'DM Sans, sans-serif', fontSize: 14,
+  color: 'var(--text)', background: 'var(--cream)',
+  outline: 'none', transition: 'border-color .2s',
+}
+
 export default function Register() {
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
@@ -104,12 +112,4 @@ function Field({ label, children }) {
       {children}
     </div>
   )
-}
-
-const inputStyle = {
-  width: '100%', padding: '.75rem 1rem',
-  border: '1.5px solid var(--border)', borderRadius: 9,
-  fontFamily: 'DM Sans, sans-serif', fontSize: 14,
-  color: 'var(--text)', background: 'var(--cream)',
-  outline: 'none', transition: 'border-color .2s',
 }

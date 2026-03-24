@@ -2,6 +2,13 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../context/AuthContext'
 
+const inputStyle = {
+  width: '100%', padding: '.7rem 1rem',
+  border: '1.5px solid var(--border)', borderRadius: 8,
+  fontFamily: 'DM Sans, sans-serif', fontSize: 14,
+  color: 'var(--text)', background: 'var(--cream)', outline: 'none',
+}
+
 export default function MyProfile() {
   const { user, profile, refreshProfile } = useAuth()
   const [form, setForm] = useState({ full_name: '', bio: '', phone: '' })
@@ -95,11 +102,4 @@ function Field({ label, children }) {
       {children}
     </div>
   )
-}
-
-const inputStyle = {
-  width: '100%', padding: '.7rem 1rem',
-  border: '1.5px solid var(--border)', borderRadius: 8,
-  fontFamily: 'DM Sans, sans-serif', fontSize: 14,
-  color: 'var(--text)', background: 'var(--cream)', outline: 'none',
 }

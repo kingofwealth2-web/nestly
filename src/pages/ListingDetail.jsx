@@ -3,6 +3,9 @@ import { useParams, Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
 
+const labelStyle = { display: 'block', fontSize: 12, fontWeight: 500, color: 'var(--text-mid)', marginBottom: '.3rem' }
+const inputStyle = { width: '100%', padding: '.65rem .85rem', border: '1.5px solid var(--border)', borderRadius: 8, fontFamily: 'DM Sans, sans-serif', fontSize: 13, color: 'var(--text)', background: 'var(--cream)', outline: 'none' }
+
 export default function ListingDetail() {
   const { id } = useParams()
   const { user, profile } = useAuth()
@@ -430,9 +433,6 @@ export default function ListingDetail() {
     </div>
   )
 }
-
-const labelStyle = { display: 'block', fontSize: 12, fontWeight: 500, color: 'var(--text-mid)', marginBottom: '.3rem' }
-const inputStyle = { width: '100%', padding: '.65rem .85rem', border: '1.5px solid var(--border)', borderRadius: 8, fontFamily: 'DM Sans, sans-serif', fontSize: 13, color: 'var(--text)', background: 'var(--cream)', outline: 'none' }
 
 function skeletonStyle({ width, height, marginBottom, borderRadius }) {
   return {

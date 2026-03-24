@@ -3,6 +3,13 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../context/AuthContext'
 
+const inputStyle = {
+  width: '100%', padding: '.7rem 1rem',
+  border: '1.5px solid var(--border)', borderRadius: 8,
+  fontFamily: 'DM Sans, sans-serif', fontSize: 14,
+  color: 'var(--text)', background: 'var(--cream)', outline: 'none',
+}
+
 export default function AddListing() {
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -168,10 +175,7 @@ export default function AddListing() {
               </div>
             )}
             <div style={{ flex: 1, minWidth: 220 }}>
-              <label style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '.5rem', border: '2px dashed var(--border)', borderRadius: 10, padding: '1.5rem', cursor: 'pointer', background: 'var(--cream)', transition: 'border-color .2s' }}
-                onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--teal)'}
-                onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
-              >
+              <label className="upload-label" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '.5rem', border: '2px dashed var(--border)', borderRadius: 10, padding: '1.5rem', cursor: 'pointer', background: 'var(--cream)', transition: 'border-color .2s' }}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" strokeWidth="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                 <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-mid)' }}>{imageFile ? imageFile.name : 'Click to upload image'}</span>
                 <span style={{ fontSize: 11, color: 'var(--text-light)' }}>PNG, JPG, WEBP up to 5MB</span>
@@ -288,11 +292,4 @@ function Field({ label, children }) {
       {children}
     </div>
   )
-}
-
-const inputStyle = {
-  width: '100%', padding: '.7rem 1rem',
-  border: '1.5px solid var(--border)', borderRadius: 8,
-  fontFamily: 'DM Sans, sans-serif', fontSize: 14,
-  color: 'var(--text)', background: 'var(--cream)', outline: 'none',
 }

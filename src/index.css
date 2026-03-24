@@ -294,3 +294,7 @@ img:not([src]) { opacity: 0; }
   opacity: 1;
   transform: translateY(0);
 }
+/* ── IMAGE UPLOAD LABEL HOVER ── */
+.upload-label:hover {
+  border-color: var(--teal) !important;
+}
