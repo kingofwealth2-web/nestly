@@ -115,12 +115,13 @@ export default function AddListing() {
       status: form.status,
     }
 
-    let error
+    let dbError
     if (isEdit) {
-      ;({ error } = await supabase.from('listings').update(payload).eq('id', id))
+      ;({ error: dbError } = await supabase.from('listings').update(payload).eq('id', id))
     } else {
-      ;({ error } = await supabase.from('listings').insert(payload))
+      ;({ error: dbError } = await supabase.from('listings').insert(payload))
     }
+    if (dbError) { setError(dbError.message); return }
 
     setLoading(false)
     if (error) { setError(error.message); return }
