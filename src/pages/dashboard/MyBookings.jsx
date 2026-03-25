@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../context/AuthContext'
-import { StatusBadge } from './DashHome'
+import { StatusBadge } from './StatusBadge'
 
 export default function MyBookings() {
   const { user, profile } = useAuth()
