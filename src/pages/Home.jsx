@@ -61,8 +61,11 @@ export default function Home() {
     fetchCategories()
     fetchFeaturedListings()
     fetchSiteStats()
-    if (user) fetchBookmarks()
   }, [])
+
+  useEffect(() => {
+    if (user) fetchBookmarks()
+  }, [user])
 
   async function fetchSiteStats() {
     const [listingsRes, categoriesRes, reviewsRes] = await Promise.all([
