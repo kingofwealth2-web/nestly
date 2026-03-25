@@ -40,7 +40,13 @@ export default function Home() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const [categories, setCategories] = useState([])
+  const [featuredListings, setFeaturedListings] = useState([])
   const [revealed, setRevealed] = useState(false)
+  const [siteStats, setSiteStats] = useState({ listings: '...', categories: '...', reviews: '...' })
+  const [bookmarks, setBookmarks] = useState(new Set())
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchLocation, setSearchLocation] = useState('')
+  const [searchCategory, setSearchCategory] = useState('')
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -50,12 +56,6 @@ export default function Home() {
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el))
     return () => observer.disconnect()
   }, [categories, featuredListings])
-  const [featuredListings, setFeaturedListings] = useState([])
-  const [siteStats, setSiteStats] = useState({ listings: '...', categories: '...', reviews: '...' })
-  const [bookmarks, setBookmarks] = useState(new Set())
-  const [searchQuery, setSearchQuery] = useState('')
-  const [searchLocation, setSearchLocation] = useState('')
-  const [searchCategory, setSearchCategory] = useState('')
 
   useEffect(() => {
     fetchCategories()
