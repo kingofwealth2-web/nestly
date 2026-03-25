@@ -141,15 +141,12 @@ export default function AddListing() {
       })(),
     }
 
-    let error
-    if (isEdit) {
-      ;({ error } = await supabase.from('listings').update(payload).eq('id', id))
-    } else {
-      ;({ error } = await supabase.from('listings').insert(payload))
-    }
+    const { error: saveError } = isEdit
+      ? await supabase.from('listings').update(payload).eq('id', id)
+      : await supabase.from('listings').insert(payload)
 
     setLoading(false)
-    if (error) { setError(error.message); return }
+    if (saveError) { setError(saveError.message); return }
     navigate('/dashboard/listings')
   }
 
