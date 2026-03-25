@@ -63,8 +63,8 @@ function FooterCol({ title, links }) {
   return (
     <div>
       <h4 style={{ fontSize: 13, fontWeight: 600, color: '#fff', marginBottom: '.75rem' }}>{title}</h4>
-      {links.map(l => (
-        <Link key={l.to} to={l.to} style={{
+      {links.map((l, i) => (
+        <Link key={i} to={l.to} style={{
           display: 'block', fontSize: 13,
           color: 'rgba(255,255,255,.45)', textDecoration: 'none',
           padding: '.25rem 0'
