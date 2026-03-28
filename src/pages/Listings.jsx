@@ -3,12 +3,6 @@ import { Link, useSearchParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
 
-const filterInput = {
-  border: '1.5px solid var(--border)', borderRadius: 7,
-  padding: '.5rem .75rem', fontFamily: 'DM Sans, sans-serif',
-  fontSize: 13, color: 'var(--text)', background: 'var(--cream)', outline: 'none',
-}
-
 export default function Listings() {
   const [searchParams, setSearchParams] = useSearchParams()
   const [listings, setListings] = useState([])
@@ -31,9 +25,38 @@ export default function Listings() {
   const [sortBy, setSortBy] = useState('created_at')
   const [priceMin, setPriceMin] = useState('')
   const [priceMax, setPriceMax] = useState('')
+  const [minRating, setMinRating] = useState('')
+  const [featuredOnly, setFeaturedOnly] = useState(false)
+  const [selectedAmenities, setSelectedAmenities] = useState([])
+
+  const AMENITIES = ['WiFi', 'Parking', 'Pool', 'AC', 'Pet-friendly', 'Gym', 'Restaurant', 'Bar', 'Rooftop', 'Delivery']
+
+  function toggleAmenity(tag) {
+    setSelectedAmenities(prev =>
+      prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
+    )
+  }
+
+  function activeFilterCount() {
+    let n = 0
+    if (priceMin) n++
+    if (priceMax) n++
+    if (minRating) n++
+    if (featuredOnly) n++
+    if (selectedAmenities.length) n++
+    return n
+  }
+
+  function clearFilters() {
+    setPriceMin('')
+    setPriceMax('')
+    setMinRating('')
+    setFeaturedOnly(false)
+    setSelectedAmenities([])
+  }
 
   useEffect(() => { fetchCategories() }, [])
-  useEffect(() => { fetchListings() }, [q, categorySlug, location, sortBy, priceMin, priceMax])
+  useEffect(() => { fetchListings() }, [q, categorySlug, location, sortBy, priceMin, priceMax, minRating, featuredOnly, selectedAmenities])
   useEffect(() => { if (user) fetchBookmarks() }, [user])
 
   async function fetchCategories() {
@@ -56,6 +79,9 @@ export default function Listings() {
     }
     if (priceMin) query = query.gte('price_from', priceMin)
     if (priceMax) query = query.lte('price_from', priceMax)
+    if (minRating) query = query.gte('avg_rating', parseFloat(minRating))
+    if (featuredOnly) query = query.eq('is_featured', true)
+    if (selectedAmenities.length > 0) query = query.contains('tags', selectedAmenities)
     query = query.order(sortBy, { ascending: false }).limit(24)
 
     const { data, count } = await query
@@ -108,7 +134,7 @@ export default function Listings() {
   }
 
   return (
-    <div className="page-enter" style={{ background: 'var(--cream)', minHeight: '100vh' }}>
+    <div style={{ background: 'var(--cream)', minHeight: '100vh' }}>
       {/* ── SEARCH BAR ── */}
       <div style={{ background: 'var(--navy)', padding: '1.5rem 2rem' }}>
         <form onSubmit={applySearch} style={{ display: 'flex', gap: '.75rem', maxWidth: 900, margin: '0 auto', flexWrap: 'wrap' }}>
@@ -147,6 +173,11 @@ export default function Listings() {
           <button onClick={() => setShowFilters(f => !f)} style={{ display: 'flex', alignItems: 'center', gap: '.4rem', padding: '.4rem .85rem', border: '1.5px solid var(--border)', borderRadius: 7, background: showFilters ? 'var(--teal-pale)' : '#fff', color: showFilters ? 'var(--teal)' : 'var(--text-mid)', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'DM Sans, sans-serif' }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
             Filters
+            {activeFilterCount() > 0 && (
+              <span style={{ background: 'var(--teal)', color: '#fff', fontSize: 10, fontWeight: 700, width: 16, height: 16, borderRadius: '50%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+                {activeFilterCount()}
+              </span>
+            )}
           </button>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem' }}>
@@ -172,19 +203,73 @@ export default function Listings() {
 
       {/* ── FILTERS PANEL ── */}
       {showFilters && (
-        <div style={{ background: '#fff', borderTop: '1.5px solid var(--border)', borderBottom: '1.5px solid var(--border)', padding: '1.25rem 2rem' }}>
-          <div style={{ maxWidth: 1140, margin: '0 auto', display: 'flex', gap: '2rem', flexWrap: 'wrap', alignItems: 'flex-end' }}>
-            <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 500, color: 'var(--text-mid)', marginBottom: '.35rem' }}>Min price</label>
-              <input type="number" value={priceMin} onChange={e => setPriceMin(e.target.value)} placeholder="GH₵0" style={{ ...filterInput, width: 120 }} />
+        <div style={{ background: '#fff', borderTop: '1.5px solid var(--border)', borderBottom: '1.5px solid var(--border)', padding: '1.5rem 2rem' }}>
+          <div style={{ maxWidth: 1140, margin: '0 auto' }}>
+
+            {/* Row 1: Price + Rating + Featured */}
+            <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', alignItems: 'flex-end', marginBottom: '1.25rem', paddingBottom: '1.25rem', borderBottom: '1.5px solid var(--border)' }}>
+              <div>
+                <label style={filterLabel}>Min price (GH₵)</label>
+                <input type="number" value={priceMin} onChange={e => setPriceMin(e.target.value)} placeholder="0" style={{ ...filterInput, width: 110 }} />
+              </div>
+              <div>
+                <label style={filterLabel}>Max price (GH₵)</label>
+                <input type="number" value={priceMax} onChange={e => setPriceMax(e.target.value)} placeholder="Any" style={{ ...filterInput, width: 110 }} />
+              </div>
+              <div>
+                <label style={filterLabel}>Min rating</label>
+                <div style={{ display: 'flex', gap: '.25rem' }}>
+                  {['', '3', '3.5', '4', '4.5'].map((r, i) => (
+                    <button key={i} onClick={() => setMinRating(r)} style={{
+                      padding: '.4rem .6rem', border: '1.5px solid var(--border)', borderRadius: 7,
+                      background: minRating === r ? 'var(--teal)' : '#fff',
+                      color: minRating === r ? '#fff' : 'var(--text-mid)',
+                      fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'DM Sans, sans-serif',
+                      whiteSpace: 'nowrap',
+                    }}>
+                      {r === '' ? 'Any' : '★ ' + r + '+'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label style={filterLabel}>Other</label>
+                <button onClick={() => setFeaturedOnly(f => !f)} style={{
+                  display: 'flex', alignItems: 'center', gap: '.4rem',
+                  padding: '.45rem .85rem', border: '1.5px solid var(--border)', borderRadius: 7,
+                  background: featuredOnly ? 'var(--teal-pale)' : '#fff',
+                  color: featuredOnly ? 'var(--teal)' : 'var(--text-mid)',
+                  fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'DM Sans, sans-serif',
+                }}>
+                  <span>{featuredOnly ? '✓' : '○'}</span> Featured only
+                </button>
+              </div>
+              <button onClick={clearFilters} style={{ marginLeft: 'auto', padding: '.45rem 1rem', border: '1.5px solid var(--border)', borderRadius: 7, background: '#fff', color: 'var(--text-mid)', fontSize: 13, cursor: 'pointer', fontFamily: 'DM Sans, sans-serif' }}>
+                Clear all
+              </button>
             </div>
+
+            {/* Row 2: Amenities / Tags */}
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 500, color: 'var(--text-mid)', marginBottom: '.35rem' }}>Max price</label>
-              <input type="number" value={priceMax} onChange={e => setPriceMax(e.target.value)} placeholder="Any" style={{ ...filterInput, width: 120 }} />
+              <label style={{ ...filterLabel, display: 'block', marginBottom: '.6rem' }}>Amenities &amp; features</label>
+              <div style={{ display: 'flex', gap: '.5rem', flexWrap: 'wrap' }}>
+                {AMENITIES.map(tag => {
+                  const active = selectedAmenities.includes(tag)
+                  return (
+                    <button key={tag} onClick={() => toggleAmenity(tag)} style={{
+                      padding: '.4rem .9rem', border: '1.5px solid ' + (active ? 'var(--teal)' : 'var(--border)'),
+                      borderRadius: 20, background: active ? 'var(--teal-pale)' : '#fff',
+                      color: active ? 'var(--teal)' : 'var(--text-mid)',
+                      fontSize: 13, fontWeight: active ? 600 : 400, cursor: 'pointer', fontFamily: 'DM Sans, sans-serif',
+                      transition: 'all .15s',
+                    }}>
+                      {active && '✓ '}{tag}
+                    </button>
+                  )
+                })}
+              </div>
             </div>
-            <button onClick={() => { setPriceMin(''); setPriceMax('') }} style={{ padding: '.5rem 1rem', border: '1.5px solid var(--border)', borderRadius: 7, background: '#fff', color: 'var(--text-mid)', fontSize: 13, cursor: 'pointer', fontFamily: 'DM Sans, sans-serif' }}>
-              Clear filters
-            </button>
+
           </div>
         </div>
       )}
@@ -219,7 +304,10 @@ export default function Listings() {
 function ListCard({ listing, bookmarked, onBookmark }) {
   return (
     <Link to={`/listings/${listing.id}`} style={{ textDecoration: 'none' }}>
-      <div className="card-hover" style={{ background: '#fff', borderRadius: 14, border: '1.5px solid var(--border)', display: 'flex', overflow: 'hidden' }}>
+      <div style={{ background: '#fff', borderRadius: 14, border: '1.5px solid var(--border)', display: 'flex', overflow: 'hidden', transition: 'all .2s' }}
+        onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,.08)'; e.currentTarget.style.borderColor = '#d0cdc8' }}
+        onMouseLeave={e => { e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.borderColor = 'var(--border)' }}
+      >
         <div style={{ width: 200, flexShrink: 0, background: 'linear-gradient(135deg,#0B6157,#1a9e8f)', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '3rem', overflow: 'hidden' }}>
           {listing.cover_image ? <img src={listing.cover_image} alt={listing.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '🏠'}
           {listing.is_featured && <span style={{ position: 'absolute', top: '.65rem', left: '.65rem', fontSize: 10, fontWeight: 600, padding: '2px 7px', borderRadius: 5, background: 'rgba(11,97,87,.9)', color: '#fff' }}>⭐ Featured</span>}
@@ -263,7 +351,10 @@ function ListCard({ listing, bookmarked, onBookmark }) {
 function GridCard({ listing, bookmarked, onBookmark }) {
   return (
     <Link to={`/listings/${listing.id}`} style={{ textDecoration: 'none' }}>
-      <div className="card-hover" style={{ background: '#fff', borderRadius: 14, border: '1.5px solid var(--border)', overflow: 'hidden' }}>
+      <div style={{ background: '#fff', borderRadius: 14, border: '1.5px solid var(--border)', overflow: 'hidden', transition: 'all .2s' }}
+        onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 12px 32px rgba(0,0,0,.1)' }}
+        onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none' }}
+      >
         <div style={{ height: 190, background: 'linear-gradient(135deg,#0B6157,#1a9e8f)', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '3.5rem', overflow: 'hidden' }}>
           {listing.cover_image ? <img src={listing.cover_image} alt={listing.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '🏠'}
           {listing.is_featured && <span style={{ position: 'absolute', top: '.75rem', left: '.75rem', fontSize: 11, fontWeight: 600, padding: '3px 8px', borderRadius: 6, background: 'rgba(11,97,87,.9)', color: '#fff' }}>⭐ Featured</span>}
@@ -398,4 +489,15 @@ function EmptyState() {
       <Link to="/listings" style={{ padding: '.65rem 1.5rem', background: 'var(--teal)', color: '#fff', borderRadius: 8, textDecoration: 'none', fontSize: 14, fontWeight: 500 }}>Clear search</Link>
     </div>
   )
+}
+
+const filterInput = {
+  border: '1.5px solid var(--border)', borderRadius: 7,
+  padding: '.5rem .75rem', fontFamily: 'DM Sans, sans-serif',
+  fontSize: 13, color: 'var(--text)', background: 'var(--cream)', outline: 'none',
+}
+
+const filterLabel = {
+  display: 'block', fontSize: 12, fontWeight: 500,
+  color: 'var(--text-mid)', marginBottom: '.35rem',
 }
